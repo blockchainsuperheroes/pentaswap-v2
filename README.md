@@ -69,6 +69,10 @@ Currently hosted on ATS server (136.116.225.232) at `/swap/` path.
 - [Terms of Service](terms-of-service.html)
 - [Disclaimer](disclaimer.html)
 
+## Security
+
+🛡️ **Audited by CertiK:** https://skynet.certik.com/projects/pentagon-games
+
 ---
 
 *Pentagon Games Ecosystem — In-game rewards only*
