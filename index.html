@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PentaSwap v2 - Pentagon Chain DEX</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --royal-purple: #5B2C8C;
+            --deep-purple: #3D1A5C;
+            --light-purple: #8B5AB8;
+            --gold: #D4AF37;
+            --gold-light: #F4D03F;
+            --gold-dark: #B8860B;
+            --bg-dark: #0D0A14;
+            --bg-card: rgba(91, 44, 140, 0.15);
+            --text: #FFFFFF;
+            --text-muted: #A89BBF;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(91, 44, 140, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--royal-purple) 0%, var(--gold) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(91, 44, 140, 0.2);
+            padding: 0.25rem;
+            border-radius: 12px;
+        }
+        
+        .nav-link {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--text);
+            background: rgba(212, 175, 55, 0.1);
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--royal-purple) 0%, var(--deep-purple) 100%);
+            color: var(--gold);
+        }
+        
+        .connect-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border: none;
+            border-radius: 12px;
+            color: var(--bg-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        /* Main Content */
+        .main {
+            max-width: 480px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        
+        .swap-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+        }
+        
+        .swap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .swap-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .settings-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(91, 44, 140, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(91, 44, 140, 0.5);
+            color: var(--gold);
+        }
+        
+        /* Token Input */
+        .token-input-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .token-input-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .token-input-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .amount-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--text);
+            outline: none;
+        }
+        
+        .amount-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .token-select {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--royal-purple);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .token-select:hover {
+            background: var(--light-purple);
+        }
+        
+        .token-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        
+        .token-symbol {
+            font-weight: 600;
+        }
+        
+        /* Swap Direction Button */
+        .swap-direction {
+            display: flex;
+            justify-content: center;
+            margin: -0.75rem 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .swap-direction-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--royal-purple);
+            border: 4px solid var(--bg-dark);
+            border-radius: 12px;
+            color: var(--gold);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+        
+        .swap-direction-btn:hover {
+            background: var(--light-purple);
+            transform: rotate(180deg);
+        }
+        
+        /* Swap Info */
+        .swap-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .swap-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            color: var(--text-muted);
+        }
+        
+        .swap-info-row span:last-child {
+            color: var(--text);
+        }
+        
+        /* Swap Button */
+        .swap-btn {
+            width: 100%;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--royal-purple) 0%, var(--deep-purple) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .swap-btn:hover {
+            background: linear-gradient(135deg, var(--light-purple) 0%, var(--royal-purple) 100%);
+            border-color: var(--gold);
+            box-shadow: 0 10px 40px rgba(91, 44, 140, 0.4);
+        }
+        
+        .swap-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .swap-btn.gold {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: var(--bg-dark);
+        }
+        
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        /* Footer Notice */
+        .notice {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 1.5rem;
+            background: rgba(91, 44, 140, 0.1);
+            border: 1px solid rgba(91, 44, 140, 0.3);
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .notice-title {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notice-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* Mobile */
+        @media (max-width: 640px) {
+            .header {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .nav {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⬡</div>
+            PentaSwap
+        </div>
+        
+        <nav class="nav">
+            <a href="#swap" class="nav-link active">Swap</a>
+            <a href="#pool" class="nav-link">Pool</a>
+            <a href="#analytics" class="nav-link">Analytics</a>
+        </nav>
+        
+        <button class="connect-btn" id="connectBtn">Connect Wallet</button>
+    </header>
+    
+    <main class="main">
+        <div class="swap-card">
+            <div class="swap-header">
+                <h2 class="swap-title">Swap</h2>
+                <button class="settings-btn">⚙️</button>
+            </div>
+            
+            <div class="token-input-container">
+                <div class="token-input-header">
+                    <span>You pay</span>
+                    <span>Balance: 0.00</span>
+                </div>
+                <div class="token-input-row">
+                    <input type="text" class="amount-input" placeholder="0" id="inputAmount">
+                    <div class="token-select" id="inputToken">
+                        <div class="token-icon">PC</div>
+                        <span class="token-symbol">PC</span>
+                        <span>▼</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swap-direction">
+                <button class="swap-direction-btn" id="swapDirection">↓</button>
+            </div>
+            
+            <div class="token-input-container">
+                <div class="token-input-header">
+                    <span>You receive</span>
+                    <span>Balance: 0.00</span>
+                </div>
+                <div class="token-input-row">
+                    <input type="text" class="amount-input" placeholder="0" id="outputAmount" readonly>
+                    <div class="token-select" id="outputToken">
+                        <div class="token-icon" style="background: linear-gradient(135deg, #8B5AB8 0%, #5B2C8C 100%);">?</div>
+                        <span class="token-symbol">Select</span>
+                        <span>▼</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swap-info" id="swapInfo" style="display: none;">
+                <div class="swap-info-row">
+                    <span>Rate</span>
+                    <span id="rate">-</span>
+                </div>
+                <div class="swap-info-row">
+                    <span>Price Impact</span>
+                    <span id="priceImpact">-</span>
+                </div>
+                <div class="swap-info-row">
+                    <span>Route</span>
+                    <span id="route">-</span>
+                </div>
+                <div class="swap-info-row">
+                    <span>Min. Received</span>
+                    <span id="minReceived">-</span>
+                </div>
+            </div>
+            
+            <button class="swap-btn" id="swapBtn" disabled>Enter an amount</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Trading Pairs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$0</div>
+                <div class="stat-label">24h Volume</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">--</div>
+                <div class="stat-label">Total TVL</div>
+            </div>
+        </div>
+    </main>
+    
+    <div class="notice">
+        <div class="notice-title">⚠️ Pentagon Games Ecosystem Only</div>
+        <div class="notice-text">
+            PentaSwap is a game reward swap system for Pentagon Games players. 
+            Only in-game tokens are supported. No external liquidity, fiat, or other cryptocurrencies.
+        </div>
+    </div>
+    
+    <script>
+        // Pentagon Chain Config
+        const CHAIN_ID = 3344;
+        const RPC_URL = 'https://rpc.pentagon.games';
+        const FACTORY = '0xC75C7E9352bC1475d7c308E65C0a21969DcEdEe7';
+        const ROUTER = '0x60b70E46178CEf34E71B61BDE2E79bbB7bA41706';
+        
+        // Token list
+        const TOKENS = {
+            PC: { symbol: 'PC', name: 'Pentagon Coin', address: 'native', decimals: 18 },
+            WPC: { symbol: 'WPC', name: 'Wrapped PC', address: '0xAA3d9411DD08FDA149d4545089e241E62EE87860', decimals: 18 },
+            ZOR: { symbol: 'ZOR', name: 'Zor Token', address: '0x07d1f327833299A5a22db588898860a6DaeC5aD6', decimals: 18 },
+            BANANA: { symbol: 'BANANA', name: 'Banana', address: '0x70b8C11D954A5bEee2fB011C0e4406F4AF961E99', decimals: 18 },
+            PROF: { symbol: 'PROF', name: 'Prof Token', address: '0xA3eD787CFcE665E9dc514ba36cE8ae2ea7e3D4C7', decimals: 18 },
+            MN: { symbol: 'MN', name: 'MN Token', address: '0xB00cE98D38D5f00980C079ff8704a3E34fF01AcB', decimals: 18 }
+        };
+        
+        // State
+        let inputToken = 'PC';
+        let outputToken = null;
+        
+        // Connect wallet
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    // Switch to Pentagon Chain
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0xD10' }] // 3344 in hex
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0xD10',
+                                    chainName: 'Pentagon Chain',
+                                    nativeCurrency: { name: 'PC', symbol: 'PC', decimals: 18 },
+                                    rpcUrls: [RPC_URL],
+                                    blockExplorerUrls: ['https://explorer.pentagon.games']
+                                }]
+                            });
+                        }
+                    }
+                    
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts[0]) {
+                        document.getElementById('connectBtn').textContent = 
+                            accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                alert('Please install a Web3 wallet');
+            }
+        });
+        
+        // Swap direction
+        document.getElementById('swapDirection').addEventListener('click', () => {
+            const temp = inputToken;
+            inputToken = outputToken;
+            outputToken = temp;
+            updateUI();
+        });
+        
+        // Input amount change
+        document.getElementById('inputAmount').addEventListener('input', (e) => {
+            const amount = e.target.value;
+            if (amount && outputToken) {
+                // TODO: Calculate output amount via router
+                document.getElementById('swapInfo').style.display = 'block';
+                document.getElementById('swapBtn').disabled = false;
+                document.getElementById('swapBtn').textContent = 'Swap';
+            } else {
+                document.getElementById('swapInfo').style.display = 'none';
+                document.getElementById('swapBtn').disabled = true;
+                document.getElementById('swapBtn').textContent = amount ? 'Select a token' : 'Enter an amount';
+            }
+        });
+        
+        function updateUI() {
+            // Update token displays
+            // TODO: Implement token selector modal
+        }
+        
+        console.log('PentaSwap v2 loaded');
+        console.log('Factory:', FACTORY);
+        console.log('Router:', ROUTER);
+        console.log('Pairs: 5 active on Pentagon Chain');
+    </script>
+</body>
+</html>
